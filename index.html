@@ -39,6 +39,272 @@
             <small>Paweł Pierzchała <a href="http://twitter.com/zwrozka">@zwrozka</a></small>
           </p>
         </section>
+
+        <section>
+          <p>Controller definition</p>
+          <pre><code data-trim contenteditable>
+angular.module('workshops.timeline')
+       .controller('TimelineController', ['$scope', controller]);
+          </code></pre>
+        </section>
+
+        <section>
+          <p>Dependency Injection</p>
+          <pre><code data-trim contenteditable>
+var controller = function($scope, $timeout, timelineService) { }
+          </code></pre>
+        </section>
+
+        <section>
+          <p>Dependencies types</p>
+          <ul>
+            <li class="fragment">constants</li>
+            <li class="fragment">values</li>
+            <li class="fragment">factories</li>
+            <li class="fragment">services</li>
+            <li class="fragment">providers</li>
+          </ul>
+        </section>
+
+        <section>
+          <p>Values & constants</p>
+          <pre><code data-trim contenteditable>
+provide.value('a', 123);
+
+function Controller(a) {
+  expect(a).toEqual(123);
+}
+          </code></pre>
+
+        </section>
+
+        <section>
+          <p>Factories</p>
+          <pre><code data-trim contenteditable>
+provide.factory('b', function(a) {
+  return a*2;
+});
+
+function Controller(b) {
+  expect(b).toEqual(246);
+}
+          </code></pre>
+        </section>
+
+        <section>
+          <p>Objects</p>
+          <pre><code data-trim contenteditable>
+function Greeter(a) {
+  this.greet = function() {
+    return 'Hello ' + a;
+  }
+}
+
+provide.factory('greeter', function(a) {
+  return new Greeter(a);
+});
+
+function Controller(greeter) {
+  expect(greeter.greet()).toEqual('Hello 123');
+}
+          </code></pre>
+        </section>
+
+        <section>
+          <p>Services</p>
+          <pre><code data-trim contenteditable>
+provide.factory('greeter', function(a) {
+  return new Greeter(a);
+});
+          </code></pre>
+          <pre><code data-trim contenteditable>
+provider.service('greeter', Greeter);
+          </code></pre>
+        </section>
+
+        <section>
+          <p>Providers</p>
+          <pre><code data-trim contenteditable>
+provide.provider('greeter2', function() {
+  var salutation = 'Hello';
+  this.setSalutation = function(s) {
+    salutation = s;
+  }
+
+  function Greeter(a) {
+    this.greet = function() {
+      return salutation + ' ' + a;
+    }
+  }
+
+  this.$get = function(a) {
+    return new Greeter(a);
+  };
+});
+          </code></pre>
+        </section>
+
+        <section>
+          <p>Providers</p>
+          <pre><code data-trim contenteditable>
+angular.module('abc', []).configure(function(greeter2Provider) {
+  greeter2Provider.setSalutation('Halo');
+});
+
+function Controller(greeter2) {
+  expect(greeter.greet()).toEqual('Halo 123');
+}
+          </code></pre>
+        </section>
+
+        <section>
+          <p>$provider</p>
+        </section>
+
+        <section>
+          <p>$injector</p>
+          <pre><code data-trim contenteditable>
+$injector.invoke(function(greeter) {
+  greeter.greet();
+})
+          </code></pre>
+          <pre><code data-trim contenteditable>
+greeter = $injector.get('greeter');
+          </code></pre>
+        </section>
+
+        <section>
+          <p>Dependency annotation</p>
+          <pre><code data-trim contenteditable>
+provider.service('greeter', ['$scope', Greeter]);
+          </code></pre>
+
+          <pre><code data-trim contenteditable>
+Greeter.$inject = ['$scope'];
+provider.service('greeter', Greeter);
+          </code></pre>
+        </section>
+
+        <section>
+          <p>Controllers, Directives & Filters</p>
+          <p><small>$controller, $directive, $filter</small></p>
+        </section>
+
+        <section>
+          <p>Angular module</p>
+          <pre><code data-trim contenteditable>
+angular.module('workshops.timeline')
+          </code></pre>
+        </section>
+
+        <section>
+          <p>Angular dependencies</p>
+          <pre><code data-trim contenteditable>
+angular.module('workshops.timeline',
+  ['ng', 'Restangular', 'workshop.directives.form'])
+          </code></pre>
+        </section>
+
+        <section>
+          <p>Modularization practices</p>
+          <ul>
+            <li class="fragment">vertically not horizontally</li>
+            <li class="fragment">at least one module per page</li>
+            <li class="fragment">one module per directive</li>
+          </ul>
+        </section>
+
+        <section>
+          <p>Testing</p>
+        </section>
+
+        <section>
+          <a href="http://pivotal.github.io/jasmine/">Jasmine</a>
+          <pre><code data-trim contenteditable>
+describe("A suite", function() {
+  it("contains spec with an expectation", function() {
+    expect(true).toBe(true);
+  });
+});
+          </code></pre>
+        </section>
+
+        <section>
+          <a href="http://docs.angularjs.org/api/angular.mock.inject">inject</a>
+          <pre><code data-trim contenteditable>
+describe('messages creation', function() {
+  it('posts new messages to the backend', inject(function($httpBackend) {
+  }));
+});
+          </code></pre>
+        </section>
+
+        <section>
+          <a href="http://docs.angularjs.org/api/angular.mock.module">module</a>
+          <pre><code data-trim contenteditable>
+describe('timelineService', function() {
+  beforeEach(module('workshops.timeline'))
+});
+          </code></pre>
+        </section>
+
+        <section>
+          <a href="http://docs.angularjs.org/api/ngMock.$httpBackend">$httpBackend</a>
+          <pre><code data-trim contenteditable>
+beforeEach(inject(function($httpBackend) {
+  $httpBackend.whenGET('/api/users')
+              .respond(200, [{id: 1, login: 'alice'}]);
+}));
+          </code></pre>
+        </section>
+
+        <section>
+          <a href="http://docs.angularjs.org/api/ng.$controller">$controller</a>
+          <pre><code data-trim contenteditable>
+it('posts new messages to the backend', inject(function($controller) {
+  var scope = {};
+  $controller('TimelineController', {'scope': scope});
+
+  expect(scope.users).toEqual([]);
+}));
+          </code></pre>
+        </section>
+
+        <section>
+          <a href="http://karma-runner.github.io/0.10/index.html">Karma</a>
+          <pre><code data-trim contenteditable>
+npm install -g karma
+          </code></pre>
+        </section>
+
+        <section>
+          <a href="https://github.com/mgonto/restangular">Restangular</a>
+          <pre><code data-trim contenteditable>
+var users = Restangular.all('/api/users').getList();
+          </code></pre>
+        </section>
+
+        <section>
+          <p>Create a timelineService</p>
+        </section>
+
+        <section>
+          <p>Test it!</p>
+        </section>
+
+        <section>
+          <p>Test integration beetwen the controller and the service</p>
+        </section>
+
+        <section>
+          <p>Routing</p>
+          <pre><code data-trim contenteditable>
+GET '/api/wall_items'
+POST '/api/wall_items'
+
+GET '/api/users'
+          </code></pre>
+        </section>
       </div>
     </div>
 
